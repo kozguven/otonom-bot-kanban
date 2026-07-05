@@ -6,7 +6,7 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 
 - [x] Vite + React projesini kur; `npm run dev` ile boş uygulama ayağa kalksın ve `npm run build` geçsin
 - [x] Vitest'i kur ve örnek bir birim test ekle; `npm test` geçsin
-- [ ] Playwright'ı headless kur ve ana sayfanın yüklendiğini doğrulayan smoke testi ekle; Playwright testi geçsin
+- [x] Playwright'ı headless kur ve ana sayfanın yüklendiğini doğrulayan smoke testi ekle; Playwright testi geçsin
 
 ## 2. Veri / kalıcılık katmanı
 
