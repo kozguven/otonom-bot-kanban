@@ -7,7 +7,8 @@ export default defineConfig({
     headless: true,
   },
   webServer: {
-    command: 'npm run dev -- --port 5199 --strictPort',
+    command:
+      'rm -f data/e2e-board.json && BOARD_FILE=data/e2e-board.json npm run dev -- --port 5199 --strictPort',
     url: 'http://localhost:5199',
     reuseExistingServer: false,
     timeout: 30_000,

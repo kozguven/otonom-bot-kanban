@@ -17,7 +17,7 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 ## 3. Kolon + kart CRUD arayüzü
 
 - [x] Üç sabit kolonu (Yapılacak / Yapılıyor / Bitti) API'den gelen verilerle render eden Board bileşenini yaz; bileşen testi + Playwright smoke ile doğrula
-- [ ] Kart ekleme özelliğini yaz (kolona yeni kart, API'ye kaydedilsin); bileşen testi + Playwright ile doğrula
+- [x] Kart ekleme özelliğini yaz (kolona yeni kart, API'ye kaydedilsin); bileşen testi + Playwright ile doğrula
 - [ ] Kart düzenleme özelliğini yaz (başlık/metin güncelleme, API'ye kaydedilsin); bileşen testi + Playwright ile doğrula
 - [ ] Kart silme özelliğini yaz (API'den de silinsin); bileşen testi + Playwright ile doğrula
 
