@@ -10,7 +10,7 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 
 ## 2. Veri / kalıcılık katmanı
 
-- [ ] JSON dosyası tabanlı kalıcılık modülünü yaz (board verisini oku/yaz); birim testleriyle doğrula
+- [x] JSON dosyası tabanlı kalıcılık modülünü yaz (board verisini oku/yaz); birim testleriyle doğrula
 - [ ] Board verisini okuyup yazan API uçlarını ekle (GET/PUT, `npm run dev` ile aynı süreçte çalışsın); API'yi testle doğrula
 - [ ] Frontend'de API ile konuşan veri erişim katmanını (fetch/save) yaz; birim testleriyle doğrula
 
