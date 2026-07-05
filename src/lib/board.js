@@ -14,6 +14,30 @@ export function findColumnOfCard(board, cardId) {
   return board.columns.find((column) => column.cards.some((card) => card.id === cardId))
 }
 
+export function moveCardToColumn(board, cardId, targetColumnId, overCardId = null) {
+  const sourceColumn = findColumnOfCard(board, cardId)
+  const targetColumn = board.columns.find((c) => c.id === targetColumnId)
+  if (!sourceColumn || !targetColumn || sourceColumn.id === targetColumn.id) return board
+
+  const card = sourceColumn.cards.find((c) => c.id === cardId)
+  const targetCards = [...targetColumn.cards]
+  const overIndex = overCardId ? targetCards.findIndex((c) => c.id === overCardId) : -1
+  targetCards.splice(overIndex === -1 ? targetCards.length : overIndex, 0, card)
+
+  return {
+    ...board,
+    columns: board.columns.map((c) => {
+      if (c.id === sourceColumn.id) {
+        return { ...c, cards: c.cards.filter((x) => x.id !== cardId) }
+      }
+      if (c.id === targetColumn.id) {
+        return { ...c, cards: targetCards }
+      }
+      return c
+    }),
+  }
+}
+
 export function reorderCardInColumn(board, columnId, activeCardId, overCardId) {
   if (activeCardId === overCardId) return board
 

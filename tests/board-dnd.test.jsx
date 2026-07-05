@@ -120,7 +120,7 @@ test('hedef olmadan bırakılırsa sıra değişmez ve API çağrılmaz', async 
   expect(saveBoard).not.toHaveBeenCalled()
 })
 
-test('farklı kolondaki kartın üzerine bırakma bu aşamada yok sayılır', async () => {
+test('farklı kolondaki kartın üzerine bırakma kartı o kartın önüne taşır ve API\'ye kaydeder', async () => {
   fetchBoard.mockResolvedValue(boardWithCards())
 
   render(<Board />)
@@ -131,8 +131,63 @@ test('farklı kolondaki kartın üzerine bırakma bu aşamada yok sayılır', as
     dragEnd({ active: { id: 'c1' }, over: { id: 'c4' } })
   })
 
+  expect(cardTitles(todo)).toEqual([
+    expect.stringContaining('İkinci kart'),
+    expect.stringContaining('Üçüncü kart'),
+  ])
+  expect(cardTitles(inProgress)).toEqual([
+    expect.stringContaining('Birinci kart'),
+    expect.stringContaining('Başka kolon kartı'),
+  ])
+
+  expect(saveBoard).toHaveBeenCalledTimes(1)
+  const saved = saveBoard.mock.calls[0][0]
+  expect(saved.columns.find((c) => c.id === 'todo').cards.map((card) => card.id)).toEqual([
+    'c2',
+    'c3',
+  ])
+  expect(
+    saved.columns.find((c) => c.id === 'in-progress').cards.map((card) => card.id),
+  ).toEqual(['c1', 'c4'])
+})
+
+test('boş kolonun üzerine bırakma kartı o kolona taşır ve API\'ye kaydeder', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  const done = screen.getByRole('region', { name: 'Bitti' })
+  expect(within(done).getByText('Henüz kart yok')).toBeTruthy()
+
+  await act(async () => {
+    dragEnd({ active: { id: 'c2' }, over: { id: 'done' } })
+  })
+
+  expect(cardTitles(todo)).toEqual([
+    expect.stringContaining('Birinci kart'),
+    expect.stringContaining('Üçüncü kart'),
+  ])
+  expect(cardTitles(done)).toEqual([expect.stringContaining('İkinci kart')])
+
+  expect(saveBoard).toHaveBeenCalledTimes(1)
+  const saved = saveBoard.mock.calls[0][0]
+  expect(saved.columns.find((c) => c.id === 'done').cards.map((card) => card.id)).toEqual([
+    'c2',
+  ])
+})
+
+test('bilinmeyen bir hedefe bırakılırsa board değişmez ve API çağrılmaz', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  await act(async () => {
+    dragEnd({ active: { id: 'c1' }, over: { id: 'bilinmeyen-hedef' } })
+  })
+
   expect(cardTitles(todo)).toHaveLength(3)
-  expect(cardTitles(inProgress)).toHaveLength(1)
   expect(saveBoard).not.toHaveBeenCalled()
 })
 

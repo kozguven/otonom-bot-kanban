@@ -24,7 +24,7 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 ## 4. Sürükle-bırak (dnd-kit)
 
 - [x] dnd-kit'i entegre et: kart bir kolon içinde sürükle-bırak ile sıralanabilsin; birim/bileşen testi ile doğrula
-- [ ] Kartların kolonlar arasında sürükle-bırak ile taşınmasını ekle ve sonucu API'ye kaydet; test + Playwright ile doğrula
+- [x] Kartların kolonlar arasında sürükle-bırak ile taşınmasını ekle ve sonucu API'ye kaydet; test + Playwright ile doğrula
 
 ## 5. Uçtan uca kalıcılık doğrulaması
 

@@ -3,6 +3,7 @@ import {
   COLUMNS,
   createEmptyBoard,
   findColumnOfCard,
+  moveCardToColumn,
   reorderCardInColumn,
 } from '../src/lib/board.js'
 
@@ -73,6 +74,48 @@ test('reorderCardInColumn girdiyi mutasyona uğratmaz, yeni board döner', () =>
 test('reorderCardInColumn aynı kart için aynı board referansını döner', () => {
   const board = boardWithCards()
   expect(reorderCardInColumn(board, 'todo', 'a', 'a')).toBe(board)
+})
+
+test('moveCardToColumn kartı hedef kolonun sonuna taşır', () => {
+  const next = moveCardToColumn(boardWithCards(), 'b', 'in-progress')
+  expect(next.columns[0].cards.map((card) => card.id)).toEqual(['a', 'c'])
+  expect(next.columns[1].cards.map((card) => card.id)).toEqual(['x', 'b'])
+})
+
+test('moveCardToColumn boş kolona taşır', () => {
+  const next = moveCardToColumn(boardWithCards(), 'a', 'done')
+  expect(next.columns[0].cards.map((card) => card.id)).toEqual(['b', 'c'])
+  expect(next.columns[2].cards.map((card) => card.id)).toEqual(['a'])
+})
+
+test('moveCardToColumn overCardId verilirse kartı onun önüne ekler', () => {
+  const next = moveCardToColumn(boardWithCards(), 'x', 'todo', 'b')
+  expect(next.columns[0].cards.map((card) => card.id)).toEqual(['a', 'x', 'b', 'c'])
+  expect(next.columns[1].cards).toEqual([])
+})
+
+test('moveCardToColumn hedefte olmayan overCardId için sona ekler', () => {
+  const next = moveCardToColumn(boardWithCards(), 'x', 'todo', 'yok')
+  expect(next.columns[0].cards.map((card) => card.id)).toEqual(['a', 'b', 'c', 'x'])
+})
+
+test('moveCardToColumn aynı kolona taşımada board değişmez', () => {
+  const board = boardWithCards()
+  expect(moveCardToColumn(board, 'a', 'todo')).toBe(board)
+})
+
+test('moveCardToColumn bilinmeyen kart ya da kolonda board değişmez', () => {
+  const board = boardWithCards()
+  expect(moveCardToColumn(board, 'yok', 'in-progress')).toBe(board)
+  expect(moveCardToColumn(board, 'a', 'yok')).toBe(board)
+})
+
+test('moveCardToColumn girdiyi mutasyona uğratmaz, yeni board döner', () => {
+  const board = boardWithCards()
+  const next = moveCardToColumn(board, 'a', 'in-progress')
+  expect(next).not.toBe(board)
+  expect(board.columns[0].cards.map((card) => card.id)).toEqual(['a', 'b', 'c'])
+  expect(board.columns[1].cards.map((card) => card.id)).toEqual(['x'])
 })
 
 test('reorderCardInColumn bilinmeyen kolon ya da kartta board değişmez', () => {

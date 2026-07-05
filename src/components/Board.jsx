@@ -4,6 +4,8 @@ import {
   KeyboardSensor,
   PointerSensor,
   closestCenter,
+  pointerWithin,
+  useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -15,13 +17,34 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { fetchBoard, saveBoard } from '../lib/api.js'
-import { findColumnOfCard, reorderCardInColumn } from '../lib/board.js'
+import { findColumnOfCard, moveCardToColumn, reorderCardInColumn } from '../lib/board.js'
 
 function createCardId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
   return `card-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+// closestCenter tam genişlikteki kartlarda sürüklenen kartın kendisini hedef seçebiliyor;
+// önce işaretçinin üzerinde durduğu hedefi al ve aktif kartı her zaman aday listesinden çıkar
+function cardCollisionDetection(args) {
+  const droppableContainers = args.droppableContainers.filter(
+    (container) => container.id !== args.active.id,
+  )
+  const pointerCollisions = pointerWithin({ ...args, droppableContainers })
+  if (pointerCollisions.length > 0) return pointerCollisions
+  return closestCenter({ ...args, droppableContainers })
+}
+
+function EmptyColumnDropArea({ columnId }) {
+  // Boş kolonun droppable olması gerekir; yoksa kolonlar arası taşımada hedef bulunamaz
+  const { setNodeRef } = useDroppable({ id: columnId })
+  return (
+    <p ref={setNodeRef} className="empty">
+      Henüz kart yok
+    </p>
+  )
 }
 
 function SortableCard({ card, children }) {
@@ -132,11 +155,18 @@ export default function Board() {
     if (!over || active.id === over.id) return
 
     const activeColumn = findColumnOfCard(board, active.id)
-    const overColumn = findColumnOfCard(board, over.id)
-    // Bu aşamada yalnızca kolon içi sıralama destekleniyor
-    if (!activeColumn || activeColumn !== overColumn) return
+    if (!activeColumn) return
 
-    const next = reorderCardInColumn(board, activeColumn.id, active.id, over.id)
+    // over.id bir kart ya da (boş kolonlarda) doğrudan kolon id'si olabilir
+    const overCardColumn = findColumnOfCard(board, over.id)
+    const overColumn =
+      overCardColumn ?? board.columns.find((column) => column.id === over.id)
+    if (!overColumn) return
+
+    const next =
+      activeColumn.id === overColumn.id
+        ? reorderCardInColumn(board, activeColumn.id, active.id, over.id)
+        : moveCardToColumn(board, active.id, overColumn.id, overCardColumn ? over.id : null)
     if (next === board) return
     persist(next)
   }
@@ -145,14 +175,18 @@ export default function Board() {
   if (!board) return <p>Yükleniyor…</p>
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={cardCollisionDetection}
+      onDragEnd={handleDragEnd}
+    >
       <div className="board">
         {saveError && <p role="alert">{saveError}</p>}
         {board.columns.map((column) => (
           <section key={column.id} className="column" aria-label={column.title}>
             <h2>{column.title}</h2>
             {column.cards.length === 0 ? (
-              <p className="empty">Henüz kart yok</p>
+              <EmptyColumnDropArea columnId={column.id} />
             ) : (
               <SortableContext
                 items={column.cards.map((card) => card.id)}
