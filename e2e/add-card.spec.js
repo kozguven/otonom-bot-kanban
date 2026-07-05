@@ -5,7 +5,7 @@ test('yeni kart eklenir, kolonda görünür ve yenilemeden sonra kalır', async 
 
   const todo = page.getByRole('region', { name: 'Yapılacak' })
   await todo.getByLabel('Yapılacak kolonuna yeni kart').fill('Playwright ile eklenen kart')
-  await todo.getByRole('button', { name: 'Ekle' }).click()
+  await todo.getByRole('button', { name: 'Ekle', exact: true }).click()
 
   await expect(todo.getByText('Playwright ile eklenen kart')).toBeVisible()
   await expect(todo.getByLabel('Yapılacak kolonuna yeni kart')).toHaveValue('')

@@ -5,17 +5,17 @@ test('kart düzenlenir, yeni başlık görünür ve yenilemeden sonra kalır', a
 
   const todo = page.getByRole('region', { name: 'Yapılacak' })
   await todo.getByLabel('Yapılacak kolonuna yeni kart').fill('Düzenlenecek kart')
-  await todo.getByRole('button', { name: 'Ekle' }).click()
+  await todo.getByRole('button', { name: 'Ekle', exact: true }).click()
   await expect(todo.getByText('Düzenlenecek kart')).toBeVisible()
 
   await todo
     .locator('li', { hasText: 'Düzenlenecek kart' })
-    .getByRole('button', { name: 'Düzenle' })
+    .getByRole('button', { name: 'Düzenle', exact: true })
     .click()
   const input = todo.getByLabel('Kart başlığını düzenle')
   await expect(input).toHaveValue('Düzenlenecek kart')
   await input.fill('Playwright ile düzenlenen kart')
-  await todo.getByRole('button', { name: 'Kaydet' }).click()
+  await todo.getByRole('button', { name: 'Kaydet', exact: true }).click()
 
   await expect(todo.getByText('Playwright ile düzenlenen kart')).toBeVisible()
   await expect(todo.getByText('Düzenlenecek kart')).toBeHidden()
