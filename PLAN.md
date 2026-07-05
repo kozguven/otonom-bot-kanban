@@ -12,7 +12,7 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 
 - [x] JSON dosyası tabanlı kalıcılık modülünü yaz (board verisini oku/yaz); birim testleriyle doğrula
 - [x] Board verisini okuyup yazan API uçlarını ekle (GET/PUT, `npm run dev` ile aynı süreçte çalışsın); API'yi testle doğrula
-- [ ] Frontend'de API ile konuşan veri erişim katmanını (fetch/save) yaz; birim testleriyle doğrula
+- [x] Frontend'de API ile konuşan veri erişim katmanını (fetch/save) yaz; birim testleriyle doğrula
 
 ## 3. Kolon + kart CRUD arayüzü
 
