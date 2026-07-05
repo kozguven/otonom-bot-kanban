@@ -1,0 +1,337 @@
+/* Atölye panosu teması: mürekkep üst bar, soğuk yüzey, durum rengiyle damgalı üç şerit */
+
+:root {
+  --ink: #24303e;
+  --ink-soft: #5b6b7d;
+  --surface: #e8ecf1;
+  --paper: #ffffff;
+  --line: #d4dbe4;
+  --danger: #9c3d31;
+  --danger-tint: #f9e6e4;
+  --accent-todo: #b4690e;
+  --accent-doing: #345fc0;
+  --accent-done: #2e7d5b;
+  --tint-todo: #f6ead9;
+  --tint-doing: #e3eafb;
+  --tint-done: #e1f0e8;
+  --radius: 10px;
+  --shadow-card: 0 1px 2px rgba(36, 48, 62, 0.08), 0 2px 8px rgba(36, 48, 62, 0.06);
+  --shadow-lift: 0 4px 10px rgba(36, 48, 62, 0.14), 0 10px 24px rgba(36, 48, 62, 0.12);
+  --font-display: 'Avenir Next', Futura, 'Trebuchet MS', ui-sans-serif, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.45;
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-doing);
+  outline-offset: 2px;
+}
+
+/* Üst bar */
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 28px;
+  background: var(--ink);
+  color: #f4f7fa;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.topbar .tagline {
+  margin: 0;
+  color: #a8b6c6;
+  font-size: 0.85rem;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+/* Pano ve kolonlar */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.board > p[role='alert'] {
+  grid-column: 1 / -1;
+}
+
+p[role='alert'] {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: #f3f5f8;
+  background: color-mix(in srgb, var(--column-accent, var(--ink-soft)) 4%, #f6f8fa);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--column-accent, var(--ink-soft));
+  border-radius: var(--radius);
+}
+
+.column:nth-of-type(1) {
+  --column-accent: var(--accent-todo);
+  --column-tint: var(--tint-todo);
+}
+
+.column:nth-of-type(2) {
+  --column-accent: var(--accent-doing);
+  --column-tint: var(--tint-doing);
+}
+
+.column:nth-of-type(3) {
+  --column-accent: var(--accent-done);
+  --column-tint: var(--tint-done);
+}
+
+/* Damga görünümlü kolon başlığı */
+.column h2 {
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--column-accent);
+  background: var(--column-tint);
+  border-radius: 999px;
+}
+
+.empty {
+  margin: 0;
+  padding: 18px 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+/* Kartlar */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.card:hover {
+  border-color: var(--column-accent);
+  box-shadow: var(--shadow-lift);
+}
+
+.card--dragging {
+  position: relative;
+  z-index: 1;
+  border-style: dashed;
+  border-color: var(--column-accent);
+  box-shadow: var(--shadow-lift);
+}
+
+.card-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.drag-handle {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9aa8b8;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+}
+
+.drag-handle:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Kart eylem butonları (Düzenle / Sil / Kaydet / İptal) */
+.card > button:not(.drag-handle),
+.card form button {
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+.card > button:not(.drag-handle):hover,
+.card form button:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* Sil butonu: Düzenle'nin hemen ardındaki buton */
+.card > button + button:hover {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+.card form button[type='submit'] {
+  border-color: var(--column-accent);
+  color: var(--column-accent);
+}
+
+.card form button[type='submit']:hover {
+  background: var(--column-tint);
+  color: var(--column-accent);
+}
+
+/* Formlar: kart içi düzenleme ve kolon altı ekleme */
+
+.card form {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.card form input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.column > form {
+  display: flex;
+  gap: 8px;
+}
+
+.column > form input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.column > form input::placeholder {
+  color: #9aa8b8;
+}
+
+.column > form input:focus-visible,
+.card form input:focus-visible {
+  outline-color: var(--column-accent);
+  outline-offset: 0;
+}
+
+.column > form button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--column-accent);
+  color: #fff;
+  font-weight: 600;
+  transition: filter 120ms ease;
+}
+
+.column > form button:hover {
+  filter: brightness(1.1);
+}
+
+.column > form button:active {
+  filter: brightness(0.92);
+}
+
+/* Duyarlılık ve hareket azaltma */
+
+@media (max-width: 820px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+
+  main {
+    padding: 16px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
