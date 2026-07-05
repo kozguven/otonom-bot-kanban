@@ -141,6 +141,98 @@ test('boş ya da yalnızca boşluktan oluşan başlıkla kart eklenmez', async (
   expect(within(todo).getByText('Henüz kart yok')).toBeTruthy()
 })
 
+test('düzenle butonuna basınca kartın başlığı düzenleme alanında açılır', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Düzenle' }))
+
+  const input = within(todo).getByLabelText('Kart başlığını düzenle')
+  expect(input.value).toBe('Alışveriş listesi yaz')
+})
+
+test('kart başlığı düzenlenince güncellenir ve API\'ye kaydedilir', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Düzenle' }))
+  fireEvent.change(within(todo).getByLabelText('Kart başlığını düzenle'), {
+    target: { value: 'Alışveriş listesini güncelle' },
+  })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Kaydet' }))
+
+  expect(within(todo).getByText('Alışveriş listesini güncelle')).toBeTruthy()
+  expect(within(todo).queryByText('Alışveriş listesi yaz')).toBeNull()
+  expect(within(todo).queryByLabelText('Kart başlığını düzenle')).toBeNull()
+
+  expect(saveBoard).toHaveBeenCalledTimes(1)
+  const saved = saveBoard.mock.calls[0][0]
+  const savedTodo = saved.columns.find((column) => column.id === 'todo')
+  expect(savedTodo.cards).toHaveLength(1)
+  expect(savedTodo.cards[0]).toEqual({ id: 'c1', title: 'Alışveriş listesini güncelle' })
+})
+
+test('düzenleme yalnızca ilgili kartı değiştirir', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const inProgress = await screen.findByRole('region', { name: 'Yapılıyor' })
+  const editButtons = within(inProgress).getAllByRole('button', { name: 'Düzenle' })
+  fireEvent.click(editButtons[1])
+  fireEvent.change(within(inProgress).getByLabelText('Kart başlığını düzenle'), {
+    target: { value: 'Testleri tekrar koş' },
+  })
+  fireEvent.click(within(inProgress).getByRole('button', { name: 'Kaydet' }))
+
+  expect(within(inProgress).getByText('Raporu bitir')).toBeTruthy()
+  expect(within(inProgress).getByText('Testleri tekrar koş')).toBeTruthy()
+
+  const saved = saveBoard.mock.calls[0][0]
+  const savedInProgress = saved.columns.find((column) => column.id === 'in-progress')
+  expect(savedInProgress.cards).toEqual([
+    { id: 'c2', title: 'Raporu bitir' },
+    { id: 'c3', title: 'Testleri tekrar koş' },
+  ])
+})
+
+test('iptal edilince başlık değişmez ve API çağrılmaz', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Düzenle' }))
+  fireEvent.change(within(todo).getByLabelText('Kart başlığını düzenle'), {
+    target: { value: 'Vazgeçilen değişiklik' },
+  })
+  fireEvent.click(within(todo).getByRole('button', { name: 'İptal' }))
+
+  expect(within(todo).getByText('Alışveriş listesi yaz')).toBeTruthy()
+  expect(within(todo).queryByText('Vazgeçilen değişiklik')).toBeNull()
+  expect(saveBoard).not.toHaveBeenCalled()
+})
+
+test('boş başlıkla kaydetmeye çalışınca kart değişmez ve API çağrılmaz', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Düzenle' }))
+  fireEvent.change(within(todo).getByLabelText('Kart başlığını düzenle'), {
+    target: { value: '   ' },
+  })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Kaydet' }))
+
+  expect(saveBoard).not.toHaveBeenCalled()
+  expect(within(todo).getByLabelText('Kart başlığını düzenle')).toBeTruthy()
+})
+
 test('kaydetme hatasında uyarı mesajı gösterilir', async () => {
   fetchBoard.mockResolvedValue(createEmptyBoard())
   saveBoard.mockRejectedValue(new Error('Kayıt başarısız'))

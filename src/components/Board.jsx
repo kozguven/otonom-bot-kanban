@@ -13,6 +13,7 @@ export default function Board() {
   const [error, setError] = useState(null)
   const [saveError, setSaveError] = useState(null)
   const [drafts, setDrafts] = useState({})
+  const [editing, setEditing] = useState(null)
 
   useEffect(() => {
     let active = true
@@ -46,6 +47,25 @@ export default function Board() {
     saveBoard(next).catch((err) => setSaveError(err.message))
   }
 
+  function saveCardEdit() {
+    const title = (editing?.value ?? '').trim()
+    if (!title) return
+
+    const next = {
+      ...board,
+      columns: board.columns.map((column) => ({
+        ...column,
+        cards: column.cards.map((card) =>
+          card.id === editing.cardId ? { ...card, title } : card,
+        ),
+      })),
+    }
+    setBoard(next)
+    setEditing(null)
+    setSaveError(null)
+    saveBoard(next).catch((err) => setSaveError(err.message))
+  }
+
   if (error) return <p role="alert">{error}</p>
   if (!board) return <p>Yükleniyor…</p>
 
@@ -61,7 +81,36 @@ export default function Board() {
             <ul className="cards">
               {column.cards.map((card) => (
                 <li key={card.id} className="card">
-                  {card.title}
+                  {editing?.cardId === card.id ? (
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault()
+                        saveCardEdit()
+                      }}
+                    >
+                      <input
+                        aria-label="Kart başlığını düzenle"
+                        value={editing.value}
+                        onChange={(event) =>
+                          setEditing((prev) => ({ ...prev, value: event.target.value }))
+                        }
+                      />
+                      <button type="submit">Kaydet</button>
+                      <button type="button" onClick={() => setEditing(null)}>
+                        İptal
+                      </button>
+                    </form>
+                  ) : (
+                    <>
+                      {card.title}
+                      <button
+                        type="button"
+                        onClick={() => setEditing({ cardId: card.id, value: card.title })}
+                      >
+                        Düzenle
+                      </button>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
