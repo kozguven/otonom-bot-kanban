@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# fake-claude: run-bot.sh'i API yakmadan test etmek için deterministik stub.
+# claude -p "<prompt>" --dangerously-skip-permissions biçiminde çağrılır.
+prompt=""
+for arg in "$@"; do
+  case "$arg" in
+    -p) continue ;;
+    --dangerously-skip-permissions) continue ;;
+    *) prompt="$arg" ;;
+  esac
+done
+
+if echo "$prompt" | grep -qi "PLAN.md dosyasına"; then
+  printf '%s\n' '- [ ] Görev A' '- [ ] Görev B' '- [ ] Görev C' > PLAN.md
+  git add PLAN.md >/dev/null 2>&1
+  git commit -m "chore: PLAN.md oluştur" >/dev/null 2>&1
+  echo "[fake-claude] PLAN.md üretildi"
+else
+  line="$(grep -n '^- \[ \]' PLAN.md | head -n1 | cut -d: -f1)"
+  if [ -n "$line" ]; then
+    sed -i '' "${line}s/^- \[ \]/- [x]/" PLAN.md
+    git add PLAN.md >/dev/null 2>&1
+    git commit -m "feat: bir görev tamam" >/dev/null 2>&1
+    echo "[fake-claude] bir görev işaretlendi"
+  fi
+fi

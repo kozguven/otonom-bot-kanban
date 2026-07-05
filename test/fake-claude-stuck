@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+prompt=""
+for arg in "$@"; do
+  case "$arg" in
+    -p|--dangerously-skip-permissions) continue ;;
+    *) prompt="$arg" ;;
+  esac
+done
+if echo "$prompt" | grep -qi "PLAN.md dosyasına"; then
+  printf '%s\n' '- [ ] Takılan görev' > PLAN.md
+  git add PLAN.md >/dev/null 2>&1; git commit -m "chore: PLAN.md" >/dev/null 2>&1
+else
+  echo "[fake-claude-stuck] görevi yapamadım (takıldım)"
+fi

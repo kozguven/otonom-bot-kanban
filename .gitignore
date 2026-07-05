@@ -1,0 +1,11 @@
+node_modules/
+dist/
+data/
+logs/
+.pwvideo/
+.pwdebug/
+.superpowers/
+workspace/
+*.log
+*.cast
+.DS_Store
