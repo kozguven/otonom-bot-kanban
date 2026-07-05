@@ -29,4 +29,4 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 ## 5. Uçtan uca kalıcılık doğrulaması
 
 - [x] Playwright uçtan uca testi yaz: kart ekle → kolonlar arası taşı → sayfayı yenile → kartın yeni yerinde durduğunu doğrula
-- [ ] Son doğrulama: `npm test`, `npm run build` ve tüm Playwright testlerinin temiz bir kurulumda geçtiğini doğrula
+- [x] Son doğrulama: `npm test`, `npm run build` ve tüm Playwright testlerinin temiz bir kurulumda geçtiğini doğrula
