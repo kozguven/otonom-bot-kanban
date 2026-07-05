@@ -47,6 +47,20 @@ export default function Board() {
     saveBoard(next).catch((err) => setSaveError(err.message))
   }
 
+  function deleteCard(cardId) {
+    const next = {
+      ...board,
+      columns: board.columns.map((column) => ({
+        ...column,
+        cards: column.cards.filter((card) => card.id !== cardId),
+      })),
+    }
+    setBoard(next)
+    if (editing?.cardId === cardId) setEditing(null)
+    setSaveError(null)
+    saveBoard(next).catch((err) => setSaveError(err.message))
+  }
+
   function saveCardEdit() {
     const title = (editing?.value ?? '').trim()
     if (!title) return
@@ -108,6 +122,9 @@ export default function Board() {
                         onClick={() => setEditing({ cardId: card.id, value: card.title })}
                       >
                         Düzenle
+                      </button>
+                      <button type="button" onClick={() => deleteCard(card.id)}>
+                        Sil
                       </button>
                     </>
                   )}

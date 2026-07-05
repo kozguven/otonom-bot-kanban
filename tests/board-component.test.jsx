@@ -233,6 +233,54 @@ test('boş başlıkla kaydetmeye çalışınca kart değişmez ve API çağrılm
   expect(within(todo).getByLabelText('Kart başlığını düzenle')).toBeTruthy()
 })
 
+test('sil butonuna basınca kart kaldırılır ve API\'ye kaydedilir', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Sil' }))
+
+  expect(within(todo).queryByText('Alışveriş listesi yaz')).toBeNull()
+  expect(within(todo).getByText('Henüz kart yok')).toBeTruthy()
+
+  expect(saveBoard).toHaveBeenCalledTimes(1)
+  const saved = saveBoard.mock.calls[0][0]
+  expect(saved.columns.find((column) => column.id === 'todo').cards).toEqual([])
+})
+
+test('silme yalnızca ilgili kartı kaldırır', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+
+  render(<Board />)
+
+  const inProgress = await screen.findByRole('region', { name: 'Yapılıyor' })
+  const deleteButtons = within(inProgress).getAllByRole('button', { name: 'Sil' })
+  fireEvent.click(deleteButtons[0])
+
+  expect(within(inProgress).queryByText('Raporu bitir')).toBeNull()
+  expect(within(inProgress).getByText('Testleri koş')).toBeTruthy()
+
+  const saved = saveBoard.mock.calls[0][0]
+  expect(saved.columns.find((column) => column.id === 'in-progress').cards).toEqual([
+    { id: 'c3', title: 'Testleri koş' },
+  ])
+  expect(saved.columns.find((column) => column.id === 'todo').cards).toHaveLength(1)
+})
+
+test('silme hatasında uyarı mesajı gösterilir', async () => {
+  fetchBoard.mockResolvedValue(boardWithCards())
+  saveBoard.mockRejectedValue(new Error('Silme kaydedilemedi'))
+
+  render(<Board />)
+
+  const todo = await screen.findByRole('region', { name: 'Yapılacak' })
+  fireEvent.click(within(todo).getByRole('button', { name: 'Sil' }))
+
+  const alert = await screen.findByRole('alert')
+  expect(alert.textContent).toContain('Silme kaydedilemedi')
+})
+
 test('kaydetme hatasında uyarı mesajı gösterilir', async () => {
   fetchBoard.mockResolvedValue(createEmptyBoard())
   saveBoard.mockRejectedValue(new Error('Kayıt başarısız'))

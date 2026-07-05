@@ -8,7 +8,10 @@ test('kart düzenlenir, yeni başlık görünür ve yenilemeden sonra kalır', a
   await todo.getByRole('button', { name: 'Ekle' }).click()
   await expect(todo.getByText('Düzenlenecek kart')).toBeVisible()
 
-  await todo.getByRole('button', { name: 'Düzenle' }).click()
+  await todo
+    .locator('li', { hasText: 'Düzenlenecek kart' })
+    .getByRole('button', { name: 'Düzenle' })
+    .click()
   const input = todo.getByLabel('Kart başlığını düzenle')
   await expect(input).toHaveValue('Düzenlenecek kart')
   await input.fill('Playwright ile düzenlenen kart')

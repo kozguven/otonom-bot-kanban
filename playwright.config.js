@@ -2,6 +2,8 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './e2e',
+  // PUT /api/board tüm board'u yazdığı için paralel worker'lar birbirinin kartını ezer
+  workers: 1,
   use: {
     baseURL: 'http://localhost:5199',
     headless: true,
