@@ -30,3 +30,7 @@ GOAL.md'deki hedefin, her biri tek başına doğrulanabilir küçük görevlere 
 
 - [x] Playwright uçtan uca testi yaz: kart ekle → kolonlar arası taşı → sayfayı yenile → kartın yeni yerinde durduğunu doğrula
 - [x] Son doğrulama: `npm test`, `npm run build` ve tüm Playwright testlerinin temiz bir kurulumda geçtiğini doğrula
+
+## 6. Görsel tasarım
+
+- [x] Uygulamaya modern, şık bir görsel tasarım (CSS) ekle: renkli/kartvari üç kolon, gölgeli ve boşluklu kart bileşenleri, okunaklı tipografi, hoş bir başlık/üst bar, buton ve sürükleme tutamacı için hover/aktif durumları, sürüklenen kart için görsel geri bildirim (gölge/opaklık). MEVCUT erişilebilirlik etiketlerini, rollerini (region/aria-label/"Kartı taşı: ...", "Ekle", "Henüz kart yok"), buton metinlerini ve tüm testleri KORU — sadece görünümü değiştir, DOM sözleşmesini değil. Doğrula: `npm test`, `npm run build` ve tüm Playwright testleri geçmeli.

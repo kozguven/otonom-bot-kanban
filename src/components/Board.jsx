@@ -48,8 +48,10 @@ function EmptyColumnDropArea({ columnId }) {
 }
 
 function SortableCard({ card, children }) {
+  // Bırakma sonrası yerleşme animasyonu kapalı: yan yana kolon düzeninde animasyon
+  // sürerken kartlar üst üste biniyor ve o anda başlayan yeni sürükleme yanlış kartı tutabiliyor
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: card.id })
+    useSortable({ id: card.id, animateLayoutChanges: () => false })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -58,7 +60,11 @@ function SortableCard({ card, children }) {
   }
 
   return (
-    <li ref={setNodeRef} style={style} className="card">
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={isDragging ? 'card card--dragging' : 'card'}
+    >
       <button
         type="button"
         className="drag-handle"
@@ -216,7 +222,7 @@ export default function Board() {
                         </form>
                       ) : (
                         <>
-                          {card.title}
+                          <span className="card-title">{card.title}</span>
                           <button
                             type="button"
                             onClick={() => setEditing({ cardId: card.id, value: card.title })}
